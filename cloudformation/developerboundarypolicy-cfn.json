@@ -1,0 +1,372 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Developer Boundary Policy",
+  "Resources" : {
+    "DeveloperBoundaryPolicy" : {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "Path": "/",
+        "ManagedPolicyName":"DeveloperBoundaryPolicy",
+        "PolicyDocument" : {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "IAMReadAccess",
+              "Effect": "Allow",
+              "Action": [
+                  "iam:GetAccountSummary",
+                  "iam:ListUser*",
+                  "iam:ListRole*",
+                  "iam:ListPol*",
+                  "iam:ListAttached*",
+                  "iam:ListAccountAliases",
+                  "iam:GetUser*",
+                  "iam:GetRole*",
+                  "iam:PutRole*",
+                  "iam:GetPolicy*"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "AllowSTS",
+              "Effect": "Allow",
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Resource": "*"              
+            },
+            {
+              "Sid": "AllowRolesOnlyInPath",
+              "Effect": "Allow",
+              "Action": [
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:PutRolePermissionsBoundary",
+                "iam:PassRole"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "EnforceActionsHaveBoundary",
+              "Effect": "Deny",
+              "Action": [
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:PutRolePermissionsBoundary"
+              ],
+              "Resource": "*",
+              "Condition": {
+                "StringNotLike": {
+                  "iam:PermissionsBoundary": "arn:aws:iam::*:policy/DeveloperBoundaryPolicy"
+                }
+              }
+            },
+            {
+              "Sid": "DenyChangesToBoundaryPolicy",
+              "Effect": "Deny",
+              "Action": [
+                "iam:DeletePolicy",
+                "iam:CreatePolicyVersion",
+                "iam:CreatePolicy",
+                "iam:DeletePolicyVersion",
+                "iam:SetDefaultPolicyVersion"
+              ],
+              "Resource": "arn:aws:iam::*:policy/DeveloperBoundaryPolicy"
+            },
+            {
+              "Sid": "StorageServicesWithAPIDataPlane",
+              "Effect": "Allow",
+              "Action": [
+                "s3:DescribeJob",
+                "s3:ListBucket",
+                "s3:ListStorageLensConfigurations",
+                "s3:ListAllMyBuckets",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListJobs",
+                "s3:ListMultipartUploadParts",
+                "s3:ListBucketVersions",
+                "s3:ListAccessPointsForObjectLambda",
+                "s3:ListAccessPoints",
+                "s3:ListMultiRegionAccessPoints",
+                "s3:GetObject",
+                "s3:GetObjectTorrent",
+                "s3:GetObjectVersionForReplication",
+                "s3:GetObjectVersionTorrent",
+                "s3:GetEncryptionConfiguration",
+                "s3:GetObjectTagging",
+                "s3:GetObjectVersionTagging",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectAcl",
+                "s3:GetObjectVersion",
+                "s3:CreateJob",
+                "s3:ReplicateObject",
+                "s3:DeleteJobTagging",
+                "s3:DeleteObject",
+                "s3:DeleteObjectTagging",
+                "s3:DeleteStorageLensConfigurationTagging",
+                "s3:DeleteObjectVersionTagging",
+                "s3:DeleteObjectVersion",
+                "s3:PutObject",
+                "s3:PutBucketTagging",
+                "s3:PutObjectTagging",
+                "s3:PutStorageLensConfigurationTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:PutJobTagging",
+                "s3:AbortMultipartUpload",
+                "s3:ReplicateTags",
+                "s3:RestoreObject",
+                "s3:UpdateJobPriority",
+                "s3:UpdateJobStatus",
+                "s3:GetBucketLocation",
+                "s3:GetLifecycleConfiguration",
+                "s3:PutLifecycleConfiguration",
+                "s3:PutObjectAcl",
+                "dynamodb:DescribeTable",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:GetItem",
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:PartiQLUpdate",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem",
+                "dynamodb:GetShardIterator",
+                "dynamodb:GetRecords",
+                "dynamodb:ListTables",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:PartiQLSelect",
+                "dynamodb:ListTagsOfResource",
+                "dynamodb:Query",
+                "dynamodb:DescribeStream",
+                "dynamodb:ListStreams",
+                "dynamodb:ListGlobalTables",
+                "dynamodb:PartiQLDelete",
+                "athena:BatchGetNamedQuery",
+                "athena:BatchGetQueryExecution",
+                "athena:CreateNamedQuery",
+                "athena:DeleteNamedQuery",
+                "athena:Get*",
+                "athena:List*",
+                "athena:StartQueryExecution",
+                "athena:StopQueryExecution"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "TraditionalAppBuildingBlocks",
+              "Effect": "Allow",
+              "Action": [
+                  "ses:Send*",
+                  "ses:*Template*",
+                  "ses:GetIdentityVerificationAttributes",
+                  "ses:VerifyEmailIdentity",
+                  "sqs:DeleteMessage*",
+                  "sqs:ReceiveMessage",
+                  "sqs:ListQueues",
+                  "sqs:GetQueueUrl",
+                  "sqs:SendMessage*",
+                  "sqs:GetQueueAttributes",
+                  "sqs:PurgeQueue",
+                  "sqs:ChangeMessageVisibility*",
+                  "sns:CreateTopic",
+                  "sns:ListSubscriptionsByTopic",
+                  "sns:SetTopicAttributes",
+                  "sns:Subscribe",
+                  "sns:ListTopics",
+                  "sns:Publish",
+                  "appsync:*",
+                  "swf:*"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "ComputeCallOuts",
+              "Effect": "Allow",
+              "Action": [
+                  "lambda:InvokeAsync",
+                  "lambda:InvokeFunction",
+                  "execute-api:*",
+                  "ecs:RunTask",
+                  "batch:DescribeJobQueues",
+                  "batch:CancelJob",
+                  "batch:SubmitJob",
+                  "batch:TerminateJob",
+                  "batch:DescribeJobs",
+                  "batch:ListJobs",
+                  "kinesis:*",
+                  "firehose:*",
+                  "states:ListStateMachines",
+                  "states:SendTaskFailure",
+                  "states:DescribeActivity",
+                  "states:ListActivities",
+                  "states:ListExecutions",
+                  "states:StopExecution",
+                  "states:StartSyncExecution",
+                  "states:SendTaskSuccess",
+                  "states:DescribeExecution",
+                  "states:StartExecution",
+                  "states:SendTaskHeartbeat",
+                  "states:GetActivityTask",
+                  "glue:*"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "EncryptionAndSecrets",
+              "Effect": "Allow",
+              "Action": [
+                "kms:Encrypt",
+                "kms:ReEncryptTo",
+                "kms:GenerateRandom",
+                "kms:GenerateDataKeyPair",
+                "kms:Verify",
+                "kms:ListAliases",
+                "kms:Decrypt",
+                "kms:GenerateDataKeyPairWithoutPlaintext",
+                "kms:ReEncryptFrom",
+                "kms:GenerateDataKeyWithoutPlaintext",
+                "kms:Sign",
+                "kms:ListKeys",
+                "kms:GenerateDataKey",
+                "acm:ListCertificates",
+                "acm:GetCertificate",
+                "acm-pca:ListCertificateAuthorities",
+                "acm-pca:GetCertificate",
+                "acm-pca:GetCertificateAuthorityCertificate",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:ListSecrets",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:RestoreSecret",
+                "secretsmanager:CancelRotateSecret",
+                "secretsmanager:UpdateSecret",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetRandomPassword",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:RotateSecret",
+                "secretsmanager:UpdateSecretVersionStage",
+                "ssm:GetParameter*",
+                "ssm:DescribeParameters",
+                "ssm:PutParameter"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "AppDeploymentAndManagement",
+              "Effect": "Allow",
+              "Action": [
+                "cloudformation:DescribeStacks",
+                "ec2:Describe*",
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+                "cloudwatch:PutMetricStream",
+                "cloudwatch:PutMetricData",
+                "logs:Describe*",
+                "logs:ListLogDeliveries",
+                "logs:ListTagsLogGroup",
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents",
+                "logs:FilterLogEvents",
+                "events:ListEventBuses",
+                "events:PutEvents",
+                "events:PutPartnerEvents",
+                "mobileanalytics:PutEvents",
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "ecr:GetAuthorizationToken",
+                "ecr:ListImages",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:DescribeImages",
+                "codepipeline:ListPipelineExecutions",
+                "codepipeline:PutJobFailureResult",
+                "codepipeline:PutJobSuccessResult",
+                "codedeploy-commands-secure:GetDeploymentSpecification",
+                "codedeploy-commands-secure:PollHostCommand",
+                "codedeploy-commands-secure:PutHostCommandAcknowledgement",
+                "codedeploy-commands-secure:PutHostCommandComplete"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "IAMReadAccess",
+              "Effect": "Allow",
+              "Action": [
+                "iam:GetAccountSummary",
+                "iam:ListUser*",
+                "iam:ListRole*",
+                "iam:ListPol*",
+                "iam:ListAttached*",
+                "iam:ListAccountAliases",
+                "iam:GetUser*",
+                "iam:GetRole*",
+                "iam:PutRole*",
+                "iam:GetPolicy*"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "OnlyPoliciesInPath",
+              "Effect": "Allow",
+              "Action": [
+                "iam:CreatePolicy",
+                "iam:CreatePolicyVersion",
+                "iam:DeletePolicy",
+                "iam:SetDefaultPolicyVersion"
+              ],
+              "Resource": "arn:aws:iam::*:policy/applicationpolicies/*"
+            },
+            {
+              "Sid": "AllowRolesOnlyInPath",
+              "Effect": "Allow",
+              "Action": [
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:PutRolePermissionsBoundary",
+                "iam:PassRole"
+              ],
+              "Resource": "arn:aws:iam::*:role/applicationroles/*"
+            },
+            {
+              "Sid": "AllowInstanceProfileInPath",
+              "Effect": "Allow",
+              "Action": [
+                "iam:CreateInstanceProfile",
+                "iam:AddRoleToInstanceProfile",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:DeleteInstanceProfile"
+              ],
+              "Resource": [
+                "arn:aws:iam::*:role/applicationroles/*",
+                "arn:aws:iam::*:instance-profile/applicationinstanceprofiles/*"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs" : {
+    "DeveloperBoundaryPolicyARN" : {
+      "Description" : "ARN of the Developer policy",
+      "Value" : { "Ref" : "DeveloperBoundaryPolicy" },
+      "Export" : {
+        "Name" : "DeveloperBoundaryPolicyARN"
+      }
+    }
+  }
+}
