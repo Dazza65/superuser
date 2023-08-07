@@ -37,15 +37,15 @@ if [ $# -ne 4 ]
 then
     Help
 else
-    for keyval in $(printf "AWS_ACCESS_KEY_ID:%s AWS_SECRET_ACCESS_KEY:%s AWS_SESSION_TOKEN:%s" \
+    for keyval in $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" \
         $(aws sts assume-role \
             --role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE} \
             --role-session-name MySessionName \
             --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
         --output text))
     do
-        key=`echo $keyval | cut -d: -f1 | tr '[:upper:]' '[:lower:]'`
-        val=`echo $keyval | cut -d: -f2`
+        key=`echo $keyval | cut -d= -f1 | tr '[:upper:]' '[:lower:]'`
+        val=`echo $keyval | cut -d= -f2-`
 
         aws configure set ${key} ${val} --profile assumed-role
     done

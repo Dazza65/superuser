@@ -48,6 +48,8 @@ The ```super-user-stack.ts``` is used to demonstrate how a developer with some r
 
 # Solution
 
-IAM permission boundaries are a good way of restricting what a role can do by specifying a set of IAM actions that can be performed irrespective of the policy that's assigned to the role. The permission boundary can prevent the user from being able modify the permission boundary itself, but alo to enforce the assigment of the permission boundary to any new IAM resources that the user might create, preventing them from elevating their access.
+The use of AWS IAM Users is highly discouraged with the preference to use a federated identity provier to provide AWS access by assuming roles which provide temporary credentials.
+
+IAM permission boundaries are a good way of restricting what a role can do by specifying a set of IAM actions that can be performed irrespective of the policy that's assigned to the role. The permission boundary can prevent the user from being able modify the permission boundary itself, but also to enforce the assigment of the permission boundary to any new IAM resources that the user might create, preventing them from elevating their access.
 
 ```cdk bootstrap --custom-permissions-boundary DeveloperBoundaryPolicy```
