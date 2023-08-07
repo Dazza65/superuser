@@ -8,8 +8,6 @@ export class SuperUserStack extends cdk.Stack {
 
     const permissionsBoundary = ManagedPolicy.fromManagedPolicyArn(this, 'devBoundaryPolicy', 'arn:aws:iam::887312641336:policy/DeveloperBoundaryPolicy');
 
-    console.log(`BP: ${permissionsBoundary}`);
-    
     new Role(this, 'SuperUserRole', {
       roleName: 'SuperUserRole',
       assumedBy: new AccountRootPrincipal(),
